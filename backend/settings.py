@@ -119,4 +119,5 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", # Reactの開発サーバーを許可
+    "https://flexboard-front01.onrender.com",
 ]
