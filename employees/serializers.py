@@ -80,7 +80,6 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
         return round(hp, 2)
 
     def get_current_role(self, obj):
-        # Use the cached active_attendance if it exists
         active_attendance = getattr(obj, '_active_attendance', None)
         if active_attendance:
             active_role = RoleActivity.objects.filter(attendance=active_attendance, end_time__isnull=True).first()

@@ -40,16 +40,13 @@ class EmployeeProfileViewSet(viewsets.ModelViewSet):
         password = user_data.pop('password', None)
         employee_number = request.data.get('employee_number')
 
-        # Enforce username is the same as employee_number
         user_data['username'] = employee_number
 
-        # Check if user with this username already exists
         if User.objects.filter(username=employee_number).exists():
             return Response({"error": "A user with this employee number already exists."},
                             status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Use create_user to handle password hashing
             user = User.objects.create_user(
                 username=user_data['username'],
                 password=password,
@@ -62,7 +59,7 @@ class EmployeeProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             if 'user' in locals() and user.id:
-                user.delete()  # Clean up user if profile creation fails
+                user.delete()  
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
@@ -70,16 +67,12 @@ class EmployeeProfileViewSet(viewsets.ModelViewSet):
         user_instance = instance.user
         user_data = request.data.pop('user', {})
         employee_number = request.data.get('employee_number', instance.employee_number)
-
-        # Enforce username is the same as employee_number
         user_data['username'] = employee_number
 
-        # Update user fields
         for attr, value in user_data.items():
             setattr(user_instance, attr, value)
         user_instance.save()
 
-        # Update profile fields
         instance.employee_number = employee_number
         instance.save()
 
@@ -87,7 +80,6 @@ class EmployeeProfileViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        # The user will be deleted as well due to on_delete=models.CASCADE
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -103,11 +95,9 @@ class EmployeeProfileViewSet(viewsets.ModelViewSet):
         if not active_attendance:
             return Response({'error': 'Employee is not checked in'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # End current role
         now = timezone.now()
         RoleActivity.objects.filter(attendance=active_attendance, end_time__isnull=True).update(end_time=now)
 
-        # Start new role
         RoleActivity.objects.create(attendance=active_attendance, role=new_role, start_time=now)
 
         return Response({'status': f'Role changed to {new_role}'}, status=status.HTTP_200_OK)

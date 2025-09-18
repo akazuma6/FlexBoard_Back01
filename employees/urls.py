@@ -10,7 +10,7 @@ from .views import (
 
 router = DefaultRouter()
 
-# 各ViewSetをURLエンドポイントとして登録します
+# 各ViewSetをURLエンドポイントとして登録
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'employeeprofiles', EmployeeProfileViewSet, basename='employeeprofile')
 router.register(r'attendances', AttendanceViewSet, basename='attendance')
